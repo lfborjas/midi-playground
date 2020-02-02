@@ -26,7 +26,7 @@
             176 :controller-change)]
     {:message-type t
      :key key
-     :velocity (if-not (= :controller-change t) velocity-or-data)
+     :velocity velocity-or-data
      :data     (if (= :controller-change t) velocity-or-data)
      :raw msg-array}))
 
@@ -52,7 +52,7 @@
    :flashing-yellow 58
    :flashing-green 56})
 
-(defn set-led-color
+(defn set-note-color
   "Turn a given key on, with the specified light behavior.
 
   The key must be the actual number corresponding to the currently selected
@@ -66,17 +66,26 @@
   [device key color-alias]
   (.send device [176 key (color->velocity color-alias)]))
 
-(defn is-control-key? [key]
+(defn is-control-key? [{:keys [key]}]
   (<= 104 key 111))
 
-(defn flash-on-press
-  "Flash a given key with the given color for a bit."
-  [device key color-alias]
-  (if (is-control-key? key)
-    (set-control-color device key color-alias)
-    (set-led-color     device key color-alias))
-  (js/setTimeout #(turn-led-off device key) 500))
+(defn is-key-release? [{:keys [velocity]}]
+  (zero? velocity))
 
+(defn is-key-press? [{:keys [velocity]}]
+  (= 127 velocity))
+
+(defn set-key-color
+  [device {:keys [key] :as msg} color-alias]
+  (if (is-control-key? msg)
+    (set-control-color device key color-alias)
+    (set-note-color     device key color-alias)))
+
+(defn turn-key-off
+  [device {:keys [key] :as msg}]
+  (if (is-control-key? msg)
+    (set-control-color device key :off)
+    (turn-led-off device key)))
 
 (defn reset
   "All LEDs turn off, mapping mode, buffer settings and duty cycle are reset."

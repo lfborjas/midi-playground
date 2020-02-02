@@ -27,9 +27,11 @@
             (assoc db :output-device device)))
 
 (re-frame/reg-fx
- ::set-led-color
- (fn [[device key]]
-   (launchpad/flash-on-press device key :full-green)))
+ ::key-feedback
+ (fn [[device msg]]
+   (if (launchpad/is-key-press? msg)
+     (launchpad/set-key-color device msg :yellow)
+     (launchpad/turn-key-off  device msg))))
 
 (re-frame/reg-event-fx
  ::parse-incoming-message
@@ -40,5 +42,5 @@
                                (fnil conj [])
                                parsed)
                ;; TODO: need an interceptor for the output device?
-               ::set-led-color [(:output-device db)
-                                (:key parsed)]})))
+               ::key-feedback [(:output-device db)
+                               parsed]})))
