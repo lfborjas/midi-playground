@@ -13,4 +13,15 @@
 (re-frame/reg-event-db
  ::set-active-panel
  (fn-traced [db [_ active-panel]]
-   (assoc db :active-panel active-panel)))
+            (assoc db :active-panel active-panel)))
+
+
+(re-frame/reg-event-db
+ ::set-input-device
+ (fn-traced [db [_ device]]
+            (assoc db :input-device device)))
+
+(re-frame/reg-event-db
+ ::set-output-device
+ (fn-traced [db [_ device]]
+            (assoc db :output-device device)))

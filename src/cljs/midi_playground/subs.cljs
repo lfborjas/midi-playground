@@ -11,3 +11,18 @@
  ::active-panel
  (fn [db _]
    (:active-panel db)))
+
+(re-frame/reg-sub
+ ::devices
+ (fn [db _]
+   (:devices db)))
+
+(re-frame/reg-sub
+ ::input-device
+ (fn [db _]
+   (:input-device db)))
+
+(re-frame/reg-sub
+ ::output-device
+ (fn [db _]
+   (:output-device db)))
