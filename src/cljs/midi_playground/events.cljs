@@ -25,3 +25,11 @@
  ::set-output-device
  (fn-traced [db [_ device]]
             (assoc db :output-device device)))
+
+(re-frame/reg-event-db
+ ::parse-incoming-message
+ (fn-traced [db [_ msg]]
+            (update-in db
+                       [:raw-input-messages]
+                       (fnil conj [])
+                       (array-seq (.-data msg)))))

@@ -34,7 +34,9 @@
                        (.. midi -outputs values next -value))]
     (when (and first-input first-output)
       (rf/dispatch [::events/set-input-device first-input])
-      (rf/dispatch [::events/set-output-device first-output]))))
+      (rf/dispatch [::events/set-output-device first-output])
+      (set! (.-onmidimessage first-input)
+            #(rf/dispatch [::events/parse-incoming-message %])))))
 
 (defn- setup-midi-devices! [midi]
   (-> midi
@@ -64,14 +66,23 @@
       :heading "Output device"
       :body (.-name o)])])
 
+(defn messages-display [messages]
+  [:div
+   (for [msg messages]
+     ^{:key (random-uuid)}
+     [:<>
+      [:pre (str msg)]])])
+
 (defn home-panel []
   (let [input (rf/subscribe [::subs/input-device])
-        output (rf/subscribe [::subs/output-device])]
+        output (rf/subscribe [::subs/output-device])
+        messages (rf/subscribe [::subs/input-messages])]
     [re-com/v-box
      :gap "1em"
      :children [[home-title]
                 [device-search-button]
-                [devices-info @input @output]]]))
+                [devices-info @input @output]
+                [messages-display @messages]]]))
 
 
 ;; about

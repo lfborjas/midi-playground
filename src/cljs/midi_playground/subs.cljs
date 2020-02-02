@@ -26,3 +26,22 @@
  ::output-device
  (fn [db _]
    (:output-device db)))
+
+(re-frame/reg-sub
+ ::raw-input-messages
+ (fn [db _]
+   (:raw-input-messages db)))
+
+(re-frame/reg-sub
+ ::input-messages
+ :<- [::raw-input-messages]
+ (fn [messages _]
+   (for [[message-type key velocity-or-data] (rseq messages)]
+     (let [t (case message-type
+               128 :note-off
+               144 :note-on
+               176 :controller-change)]
+       {:message-type t
+        :key key
+        :velocity (if-not (= :controller-change t) velocity-or-data)
+        :data     (if (= :controller-change t) velocity-or-data)}))))
