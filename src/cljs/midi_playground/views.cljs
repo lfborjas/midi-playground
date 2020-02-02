@@ -20,13 +20,6 @@
    :label "go to About Page"
    :href "#/about"])
 
-#_(defn device-selector [devices]
-    [re-com/single-dropdown
-     :choices devices
-     :model nil
-     :on-change #(println %)
-     :placeholder "Select a MIDI device"])
-
 (defn- parse-devices! [midi]
   (let [first-input (if (pos? (.. midi -inputs -size))
                       (.. midi -inputs values next -value))

@@ -26,10 +26,23 @@
  (fn-traced [db [_ device]]
             (assoc db :output-device device)))
 
-(re-frame/reg-event-db
+(re-frame/reg-fx
+ ::set-led-color
+ (fn [[device key]]
+   (.send device [144 ;; note-on
+                  key
+                  12;; Green, full brightness.
+                  ])))
+
+(re-frame/reg-event-fx
  ::parse-incoming-message
- (fn-traced [db [_ msg]]
-            (update-in db
-                       [:raw-input-messages]
-                       (fnil conj [])
-                       (array-seq (.-data msg)))))
+ (fn-traced [{:keys [db]} [_ msg]]
+            (let [data-vec (array-seq (.-data msg))]
+              {:db  (update-in db
+                               [:raw-input-messages]
+                               (fnil conj [])
+                               data-vec)
+               ;; TODO: need an interceptor for the output device?
+               ::set-led-color [(:output-device db)
+                                (nth data-vec
+                                     1)]})))

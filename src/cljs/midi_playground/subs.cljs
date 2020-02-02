@@ -36,7 +36,7 @@
  ::input-messages
  :<- [::raw-input-messages]
  (fn [messages _]
-   (for [[message-type key velocity-or-data] (rseq messages)]
+   (for [[message-type key velocity-or-data] ((fnil rseq []) messages)]
      (let [t (case message-type
                128 :note-off
                144 :note-on
