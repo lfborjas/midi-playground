@@ -1,6 +1,7 @@
 (ns midi-playground.subs
   (:require
-   [re-frame.core :as re-frame]))
+   [re-frame.core :as re-frame]
+   ))
 
 (re-frame/reg-sub
  ::name
@@ -36,12 +37,4 @@
  ::input-messages
  :<- [::raw-input-messages]
  (fn [messages _]
-   (for [[message-type key velocity-or-data] ((fnil rseq []) messages)]
-     (let [t (case message-type
-               128 :note-off
-               144 :note-on
-               176 :controller-change)]
-       {:message-type t
-        :key key
-        :velocity (if-not (= :controller-change t) velocity-or-data)
-        :data     (if (= :controller-change t) velocity-or-data)}))))
+   ((fnil rseq []) messages)))
