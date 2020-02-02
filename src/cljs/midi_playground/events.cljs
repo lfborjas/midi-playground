@@ -29,10 +29,7 @@
 (re-frame/reg-fx
  ::set-led-color
  (fn [[device key]]
-   (.send device [144 ;; note-on
-                  key
-                  60 ;; Green, full brightness.
-                  ])))
+   (launchpad/flash-on-press device key :full-green)))
 
 (re-frame/reg-event-fx
  ::parse-incoming-message
