@@ -1,5 +1,6 @@
 (ns midi-playground.views
   (:require
+   [reagent.core :as r]
    [re-frame.core :as rf]
    [re-com.core :as re-com]
    [midi-playground.subs :as subs]
@@ -68,14 +69,28 @@
      [:<>
       [:pre (str msg)]])])
 
+(defn toggle-layout-button [current-layout]
+  (let [set-layout #(if (= :x-y current-layout)
+                      (rf/dispatch [::events/set-layout :drum-rack])
+                      (rf/dispatch [::events/set-layout :x-y]))
+        layout (if (= :x-y current-layout)
+                 "X-Y Layout"
+                 "Drum Machine Layout")]
+    [re-com/button
+     :label layout
+     :on-click set-layout]))
+
 (defn home-panel []
   (let [input (rf/subscribe [::subs/input-device])
         output (rf/subscribe [::subs/output-device])
-        messages (rf/subscribe [::subs/input-messages])]
+        messages (rf/subscribe [::subs/input-messages])
+        layout   (rf/subscribe [::subs/input-layout])]
     [re-com/v-box
      :gap "1em"
      :children [[home-title]
-                [device-search-button]
+                [re-com/h-box
+                 :children [[device-search-button]
+                            [toggle-layout-button @layout]]]
                 [devices-info @input @output]
                 [messages-display @messages]]]))
 

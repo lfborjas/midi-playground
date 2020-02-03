@@ -49,6 +49,11 @@
      (audio/note-off audio/context*
                      audio-nodes))))
 
+(re-frame/reg-fx
+ ::change-layout!
+ (fn [[device layout]]
+   (launchpad/set-mapping-mode device layout)))
+
 (re-frame/reg-event-fx
  ::parse-incoming-message
  (fn-traced [{:keys [db]} [_ msg]]
@@ -62,3 +67,11 @@
                                parsed]
                ::play-note    [(:audio-nodes db)
                                parsed]})))
+
+
+(re-frame/reg-event-fx
+ ::set-layout
+ (fn-traced [{:keys [db]} [_ layout]]
+            {:db (assoc db :current-layout layout)
+             ::change-layout! [(:output-device db)
+                               layout]}))

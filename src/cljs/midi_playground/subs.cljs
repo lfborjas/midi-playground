@@ -38,3 +38,9 @@
  :<- [::raw-input-messages]
  (fn [messages _]
    ((fnil rseq []) messages)))
+
+
+(re-frame/reg-sub
+ ::input-layout
+ (fn [db _]
+   (:current-layout db)))
