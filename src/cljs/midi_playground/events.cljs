@@ -3,6 +3,7 @@
    [re-frame.core :as re-frame]
    [midi-playground.db :as db]
    [midi-playground.launchpad :as launchpad]
+   [midi-playground.audio :as audio]
    [day8.re-frame.tracing :refer-macros [fn-traced]]))
 
 (re-frame/reg-event-db
@@ -26,12 +27,27 @@
  (fn-traced [db [_ device]]
             (assoc db :output-device device)))
 
+(re-frame/reg-event-db
+ ::setup-audio-pipeline
+ (fn-traced [db [_]]
+            (assoc db :audio-nodes (audio/setup-nodes audio/context*))))
+
 (re-frame/reg-fx
  ::key-feedback
  (fn [[device msg]]
    (if (launchpad/is-key-press? msg)
      (launchpad/set-key-color device msg :yellow)
      (launchpad/turn-key-off  device msg))))
+
+(re-frame/reg-fx
+ ::play-note
+ (fn [[audio-nodes {:keys [key] :as msg}]]
+   (if (launchpad/is-key-press? msg)
+     (audio/note-on audio/context*
+                    audio-nodes
+                    key)
+     (audio/note-off audio/context*
+                     audio-nodes))))
 
 (re-frame/reg-event-fx
  ::parse-incoming-message
@@ -43,4 +59,6 @@
                                parsed)
                ;; TODO: need an interceptor for the output device?
                ::key-feedback [(:output-device db)
+                               parsed]
+               ::play-note    [(:audio-nodes db)
                                parsed]})))

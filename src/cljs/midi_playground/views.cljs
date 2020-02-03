@@ -6,8 +6,9 @@
    [midi-playground.events :as events]))
 
 
-;; home
+;; Some references:
 ;; https://webaudiodemos.appspot.com/midi-synth/index.html
+;; https://www.onlinemusictools.com/webmiditest/
 
 (defn home-title []
   (let [name (rf/subscribe [::subs/name])]
@@ -28,6 +29,7 @@
     (when (and first-input first-output)
       (rf/dispatch [::events/set-input-device first-input])
       (rf/dispatch [::events/set-output-device first-output])
+      (rf/dispatch [::events/setup-audio-pipeline])
       (set! (.-onmidimessage first-input)
             #(rf/dispatch [::events/parse-incoming-message %])))))
 
